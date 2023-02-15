@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
-    Route,
-    Switch
+    Route, Switch
 } from 'react-router-dom';
 import AppHeader from '../common/AppHeader';
 import Home from '../home/Home';
@@ -23,9 +22,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            authenticated: false,
-            currentUser: null,
-            loading: true
+            authenticated: false, currentUser: null, loading: true
         }
 
         this.loadCurrentlyLoggedInUser = this.loadCurrentlyLoggedInUser.bind(this);
@@ -36,9 +33,7 @@ class App extends Component {
         getCurrentUser()
             .then(response => {
                 this.setState({
-                    currentUser: response,
-                    authenticated: true,
-                    loading: false
+                    currentUser: response, authenticated: true, loading: false
                 });
             }).catch(error => {
             this.setState({
@@ -50,8 +45,7 @@ class App extends Component {
     handleLogout() {
         localStorage.removeItem(ACCESS_TOKEN);
         this.setState({
-            authenticated: false,
-            currentUser: null
+            authenticated: false, currentUser: null
         });
         Alert.success("You're safely logged out!");
     }
@@ -65,8 +59,7 @@ class App extends Component {
             return <LoadingIndicator/>
         }
 
-        return (
-            <div className="app">
+        return (<div className="app">
                 <div className="app-top-box">
                     <AppHeader authenticated={this.state.authenticated} onLogout={this.handleLogout}/>
                 </div>
@@ -89,8 +82,7 @@ class App extends Component {
                 <Alert stack={{limit: 3}}
                        timeout={3000}
                        position='top-right' effect='slide' offset={65}/>
-            </div>
-        );
+            </div>);
     }
 }
 
