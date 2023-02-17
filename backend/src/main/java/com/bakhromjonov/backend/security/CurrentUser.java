@@ -1,4 +1,4 @@
-package com.bakhromjonov.backend.service;
+package com.bakhromjonov.backend.security;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
