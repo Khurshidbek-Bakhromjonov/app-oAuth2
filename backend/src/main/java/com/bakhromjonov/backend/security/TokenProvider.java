@@ -1,17 +1,19 @@
 package com.bakhromjonov.backend.security;
 
 import com.bakhromjonov.backend.config.AppProperties;
+import com.bakhromjonov.backend.util.AppConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class TokenProvider {
 
@@ -32,13 +34,16 @@ public class TokenProvider {
                 .compact();
     }
 
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
+    public String getUserIdFromToken(String token) {
+
+        if (token.startsWith(AppConstants.TOKEN_TYPE))
+            token = token.substring(AppConstants.TOKEN_TYPE.length());
+
+        return Jwts.parser()
                 .setSigningKey(appProperties.getAuth().getTokenSecret())
                 .parseClaimsJws(token)
-                .getBody();
-
-        return Long.parseLong(claims.getSubject());
+                .getBody()
+                .getSubject();
     }
 
     public boolean validateToken(String authToken) {
