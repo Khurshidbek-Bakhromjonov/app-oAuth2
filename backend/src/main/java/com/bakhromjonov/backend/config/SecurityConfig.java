@@ -1,5 +1,6 @@
 package com.bakhromjonov.backend.config;
 
+import com.bakhromjonov.backend.security.AuthEntryPoint;
 import com.bakhromjonov.backend.security.CustomUserDetailsService;
 import com.bakhromjonov.backend.security.RestAuthenticationEntryPoint;
 import com.bakhromjonov.backend.security.TokenAuthenticationFilter;
@@ -36,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
+    private final AuthEntryPoint authEntryPoint;
+
     private final CustomOAuth2UserService customOAuth2UserService;
 
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -44,15 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookiesOAuth2AuthorizationRequestRepository;
 
-    /*
-      By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
-      the authorization request. But, since our service is stateless, we can't save it in
-      the session. We'll save the request in a Base64 encoded cookie instead.
-    */
-//    @Bean
-//    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
-//        return new HttpCookieOAuth2AuthorizationRequestRepository();
-//    }
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -77,21 +71,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors()
-                .and()
+                   .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                   .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                   .and()
                 .csrf()
-                .disable()
+                   .disable()
                 .formLogin()
-                .disable()
+                   .disable()
                 .httpBasic()
-                .disable()
+                   .disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
+                   .authenticationEntryPoint(authEntryPoint)
+                   .and()
                 .authorizeRequests()
-                .antMatchers("/",
+                   .antMatchers("/",
                         "/error",
                         "/favicon.ico",
                         "/**/*.png",
@@ -101,28 +95,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js")
-                .permitAll()
-                .antMatchers("/auth/**", "/oauth2/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
+                        .permitAll()
+                   .antMatchers("/auth/**", "/oauth2/**")
+                        .permitAll()
+                   .anyRequest()
+                        .authenticated()
+                   .and()
                 .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(httpCookiesOAuth2AuthorizationRequestRepository)
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService)
-                .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
-                .and()
-                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        // Add our custom Token based authentication filter
-//        http.addFilterBefore();
+                   .authorizationEndpoint()
+                        .baseUri("/oauth2/authorize")
+                        .authorizationRequestRepository(httpCookiesOAuth2AuthorizationRequestRepository)
+                        .and()
+                   .redirectionEndpoint()
+                        .baseUri("/oauth2/callback/*")
+                        .and()
+                   .userInfoEndpoint()
+                        .userService(customOAuth2UserService)
+                        .and()
+                   .successHandler(oAuth2AuthenticationSuccessHandler)
+                   .failureHandler(oAuth2AuthenticationFailureHandler);
+
+        http.addFilterBefore(tokenAuthenticationFilter,UsernamePasswordAuthenticationFilter.class);
     }
 }
+
+
